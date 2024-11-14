@@ -9,7 +9,19 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var quiz: TextView
+    private lateinit var btn_true: Button
+    private lateinit var btn_false: Button
+    private lateinit var btn_next: Button
 
+    private val questions = listOf(
+        "Москва - столица России",
+        "Берлин - столица Франции",
+        "Париж - столица Франции",
+        "Мадрид - столица Испании"
+    )
+    private val answers = listOf(true, false, true, true)
+    private var currentIndex = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
