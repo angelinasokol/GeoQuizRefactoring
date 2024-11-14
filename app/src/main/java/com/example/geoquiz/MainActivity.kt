@@ -23,6 +23,9 @@ class MainActivity : AppCompatActivity() {
     )
     private val answers = listOf(true, false, true, true)
     private var currentIndex = 0
+    companion object {
+        private const val KEY_INDEX = "currentIndex"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,10 +35,17 @@ class MainActivity : AppCompatActivity() {
         btn_false = findViewById(R.id.btn_false)
         btn_next = findViewById(R.id.btn_next)
         updateQuestion()
+        currentIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
+        updateQuestion()
 
         btn_true.setOnClickListener {checkAnswer(true)}
         btn_false.setOnClickListener {checkAnswer(false)}
         btn_next.setOnClickListener {nextQuestion()}
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_INDEX, currentIndex)
     }
     private fun updateQuestion(){
         quiz.text = questions[currentIndex]
