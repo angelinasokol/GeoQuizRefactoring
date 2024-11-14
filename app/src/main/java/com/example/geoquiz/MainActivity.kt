@@ -41,11 +41,7 @@ class MainActivity : AppCompatActivity() {
 
         btn_true.setOnClickListener {checkAnswer(true)}
         btn_false.setOnClickListener {checkAnswer(false)}
-        btn_next.setOnClickListener {
-            nextQuestion()
-            btn_true.visibility = View.VISIBLE
-            btn_false.visibility = View.VISIBLE
-        }
+        btn_next.setOnClickListener { nextQuestion() }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -61,9 +57,18 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         btn_true.visibility = View.INVISIBLE
         btn_false.visibility = View.INVISIBLE
+        if (currentIndex == questions.size - 1) {
+            btn_next.visibility = View.INVISIBLE
+            btn_next.isEnabled = false
+        }
     }
     private fun nextQuestion() {
-        currentIndex = (currentIndex + 1) % questions.size
-        updateQuestion()
+        if (currentIndex < questions.size - 1) {
+            currentIndex = (currentIndex + 1) % questions.size
+            updateQuestion()
+
+            btn_true.visibility = View.VISIBLE
+            btn_false.visibility = View.VISIBLE
+        }
     }
 }
