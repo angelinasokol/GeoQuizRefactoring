@@ -31,6 +31,11 @@ class MainActivity : AppCompatActivity() {
         btn_true = findViewById(R.id.btn_true)
         btn_false = findViewById(R.id.btn_false)
         btn_next = findViewById(R.id.btn_next)
+        updateQuestion()
+
+        btn_true.setOnClickListener {checkAnswer(true)}
+        btn_false.setOnClickListener {checkAnswer(false)}
+        btn_next.setOnClickListener {nextQuestion()}
     }
     private fun updateQuestion(){
         quiz.text = questions[currentIndex]
