@@ -26,5 +26,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        quiz = findViewById(R.id.quiz)
+        btn_true = findViewById(R.id.btn_true)
+        btn_false = findViewById(R.id.btn_false)
+        btn_next = findViewById(R.id.btn_next)
     }
 }
