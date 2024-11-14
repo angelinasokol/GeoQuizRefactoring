@@ -1,6 +1,7 @@
 package com.example.geoquiz
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -40,7 +41,11 @@ class MainActivity : AppCompatActivity() {
 
         btn_true.setOnClickListener {checkAnswer(true)}
         btn_false.setOnClickListener {checkAnswer(false)}
-        btn_next.setOnClickListener {nextQuestion()}
+        btn_next.setOnClickListener {
+            nextQuestion()
+            btn_true.visibility = View.VISIBLE
+            btn_false.visibility = View.VISIBLE
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -54,6 +59,8 @@ class MainActivity : AppCompatActivity() {
         val correctAnswer = answers[currentIndex]
         val message = if (userAnswer == correctAnswer) "Правильно!" else "Неправильно!"
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        btn_true.visibility = View.INVISIBLE
+        btn_false.visibility = View.INVISIBLE
     }
     private fun nextQuestion() {
         currentIndex = (currentIndex + 1) % questions.size
