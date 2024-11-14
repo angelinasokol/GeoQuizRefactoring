@@ -3,6 +3,7 @@ package com.example.geoquiz
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -30,5 +31,17 @@ class MainActivity : AppCompatActivity() {
         btn_true = findViewById(R.id.btn_true)
         btn_false = findViewById(R.id.btn_false)
         btn_next = findViewById(R.id.btn_next)
+    }
+    private fun updateQuestion(){
+        quiz.text = questions[currentIndex]
+    }
+    private fun checkAnswer(userAnswer: Boolean){
+        val correctAnswer = answers[currentIndex]
+        val message = if (userAnswer == correctAnswer) "Правильно!" else "Неправильно!"
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+    private fun nextQuestion() {
+        currentIndex = (currentIndex + 1) % questions.size
+        updateQuestion()
     }
 }
