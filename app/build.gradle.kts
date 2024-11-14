@@ -6,7 +6,9 @@ plugins {
 android {
     namespace = "com.example.geoquiz"
     compileSdk = 35
-
+    viewBinding {
+        enable = true
+    }
     defaultConfig {
         applicationId = "com.example.geoquiz"
         minSdk = 34
