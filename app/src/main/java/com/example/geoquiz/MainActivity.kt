@@ -24,8 +24,10 @@ class MainActivity : AppCompatActivity() {
     )
     private val answers = listOf(true, false, true, true)
     private var currentIndex = 0
+    private var correctAnswerCount = 0
     companion object {
         private const val KEY_INDEX = "currentIndex"
+        private const val KEY_SCORE = "correctAnswersCount"
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +40,8 @@ class MainActivity : AppCompatActivity() {
         updateQuestion()
         currentIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
         updateQuestion()
+        correctAnswerCount = savedInstanceState?.getInt(KEY_SCORE) ?: 0
+        updateQuestion()
 
         btn_true.setOnClickListener {checkAnswer(true)}
         btn_false.setOnClickListener {checkAnswer(false)}
@@ -47,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(KEY_INDEX, currentIndex)
+        outState.putInt(KEY_SCORE, correctAnswerCount)
     }
     private fun updateQuestion(){
         quiz.text = questions[currentIndex]
@@ -60,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         if (currentIndex == questions.size - 1) {
             btn_next.visibility = View.INVISIBLE
             btn_next.isEnabled = false
+            showResult()
         }
     }
     private fun nextQuestion() {
@@ -70,5 +76,12 @@ class MainActivity : AppCompatActivity() {
             btn_true.visibility = View.VISIBLE
             btn_false.visibility = View.VISIBLE
         }
+    }
+    private fun showResult() {
+        Toast.makeText(
+            this,
+            "Ваш результат: $correctAnswerCount из ${questions.size}",
+            Toast.LENGTH_LONG
+        ).show()
     }
 }
