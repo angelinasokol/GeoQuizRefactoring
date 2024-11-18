@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private var isCheatUsed = false // Флаг для отслеживания использования подсказки
     private var cheatCount = 0 // Счетчик использованных подсказок
     private val maxCheats = 3 // Максимальное количество подсказок
+    private lateinit var cheatCountTextView: TextView // Текстовое поле для отображения оставшихся подсказок
 
     // Обработчик результата из CheatActivity
     private val cheatLauncher =
@@ -37,7 +39,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        cheatCountTextView = findViewById(R.id.cheatCountTextView)
+        updateCheatCountDisplay()
         updateQuestion()
 
         binding.btnTrue.setOnClickListener { checkAnswer(true) }
@@ -51,6 +54,7 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra("EXTRA_ANSWER_IS_TRUE", quizViewModel.getCorrectAnswer())
                 cheatLauncher.launch(intent)
                 cheatCount++ // Увеличиваем счетчик подсказок
+                updateCheatCountDisplay() // Обновляем отображение подсказок
             } else {
                 Toast.makeText(this, "Вы использовали все подсказки!", Toast.LENGTH_SHORT).show()
                 binding.btnCheat.visibility = View.INVISIBLE // Скрываем кнопку, если подсказки закончились
@@ -71,18 +75,25 @@ class MainActivity : AppCompatActivity() {
         outState.putInt("KEY_SCORE", quizViewModel.correctAnswerCount)
     }
 
+    private fun updateCheatCountDisplay() {
+        val remainingCheats = maxCheats - cheatCount
+        cheatCountTextView.text = "Осталось подсказок: $remainingCheats"
+    }
+
     private fun updateQuestion() {
         binding.quiz.text = quizViewModel.currentQuestion
         isCheatUsed = false // Сбрасываем флаг при переходе к следующему вопросу
         binding.btnCheat.visibility = if (cheatCount < maxCheats) View.VISIBLE else View.INVISIBLE // Показываем кнопку, если есть доступные подсказки
         binding.btnTrue.visibility = View.VISIBLE // Делаем кнопки TRUE и FALSE видимыми
         binding.btnFalse.visibility = View.VISIBLE
+
+        updateCheatCountDisplay() // Обновляем отображение подсказок
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
         val isCorrect = quizViewModel.checkAnswer(userAnswer)
 
-
+        // Если была использована подсказка, не засчитываем правильный ответ
         val message = if (isCheatUsed) {
             "Вы использовали подсказку!"
         } else {
