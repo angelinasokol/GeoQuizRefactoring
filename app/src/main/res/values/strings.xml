@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GeoQuiz</string>
+    <string name="api_level_text">Версия API: %1$d</string>
 </resources>

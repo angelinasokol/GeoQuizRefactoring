@@ -1,6 +1,6 @@
 package com.example.geoquiz
 
-import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.geoquiz.databinding.ActivityCheatBinding
@@ -14,15 +14,16 @@ class CheatActivity : AppCompatActivity() {
 
         binding = ActivityCheatBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         val answerIsTrue = intent.getBooleanExtra("EXTRA_ANSWER_IS_TRUE", false)
-
         binding.btnShowAnswer.setOnClickListener {
-            val answerText = if (answerIsTrue) "Правда" else "Ложь"
-            binding.txtAnswer.text = answerText
-            val resultIntent = Intent()
-            resultIntent.putExtra("EXTRA_ANSWER_SHOWN", true)
-            setResult(RESULT_OK, resultIntent)
+            binding.txtAnswer.text = if (answerIsTrue) "Правда" else "Ложь"
+            setAnswerShownResult(true)
         }
+
+        binding.apiLevelTextView.text = getString(R.string.api_level_text, Build.VERSION.SDK_INT)
+    }
+
+    private fun setAnswerShownResult(isAnswerShown: Boolean) {
+        setResult(RESULT_OK, intent.putExtra("EXTRA_ANSWER_SHOWN", isAnswerShown))
     }
 }
