@@ -15,12 +15,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val quizViewModel: QuizViewModel by viewModels()
 
+    private var isCheatUsed = false // Флаг для отслеживания использования подсказки
+
     // Обработчик результата из CheatActivity
     private val cheatLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val answerShown = result.data?.getBooleanExtra("EXTRA_ANSWER_SHOWN", false) ?: false
                 if (answerShown) {
+                    isCheatUsed = true
+                    binding.btnCheat.visibility = View.INVISIBLE // Скрываем кнопку CHEAT
                     Toast.makeText(this, "Вы использовали подсказку", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -29,14 +33,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Настройка привязки интерфейса
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Обновление текущего вопроса
         updateQuestion()
 
-        // Установка обработчиков для кнопок
         binding.btnTrue.setOnClickListener { checkAnswer(true) }
         binding.btnFalse.setOnClickListener { checkAnswer(false) }
         binding.btnNext.setOnClickListener { nextQuestion() }
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         // Обработчик для кнопки CHEAT
         binding.btnCheat.setOnClickListener {
             val intent = Intent(this, CheatActivity::class.java)
-            intent.putExtra("EXTRA_ANSWER_IS_TRUE", quizViewModel.checkAnswer(true))
+            intent.putExtra("EXTRA_ANSWER_IS_TRUE", quizViewModel.getCorrectAnswer())
             cheatLauncher.launch(intent)
         }
 
@@ -64,20 +65,41 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateQuestion() {
         binding.quiz.text = quizViewModel.currentQuestion
+        isCheatUsed = false // Сбрасываем флаг при переходе к следующему вопросу
+        binding.btnCheat.visibility = View.VISIBLE // Делаем кнопку CHEAT снова видимой
+        binding.btnTrue.visibility = View.VISIBLE // Делаем кнопки TRUE и FALSE видимыми
+        binding.btnFalse.visibility = View.VISIBLE
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
         val isCorrect = quizViewModel.checkAnswer(userAnswer)
-        val message = if (isCorrect) "Правильно!" else "Неправильно!"
+
+        // Если была использована подсказка, не засчитываем правильный ответ
+        val message = if (isCheatUsed) {
+            "Вы использовали подсказку!"
+        } else {
+            if (isCorrect) {
+                quizViewModel.correctAnswerCount++
+                "Правильно!"
+            } else {
+                "Неправильно!"
+            }
+        }
+
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
         // Скрываем кнопки после ответа
         binding.btnTrue.visibility = View.INVISIBLE
         binding.btnFalse.visibility = View.INVISIBLE
 
+        // Если это последний вопрос, скрываем кнопку Next и показываем результат
         if (quizViewModel.isLastQuestion()) {
             binding.btnNext.visibility = View.INVISIBLE
             binding.btnNext.isEnabled = false
+            binding.btnCheat.visibility = View.INVISIBLE
+            binding.btnCheat.isEnabled = false
+            binding.quiz.visibility = View.INVISIBLE
+            binding.quiz.isEnabled = false
             showResult()
         }
     }
@@ -86,10 +108,6 @@ class MainActivity : AppCompatActivity() {
         if (!quizViewModel.isLastQuestion()) {
             quizViewModel.moveToNextQuestion()
             updateQuestion()
-
-            // Возвращаем кнопки после перехода к следующему вопросу
-            binding.btnTrue.visibility = View.VISIBLE
-            binding.btnFalse.visibility = View.VISIBLE
         }
     }
 
@@ -121,12 +139,11 @@ class MainActivity : AppCompatActivity() {
             get() = questions.size
 
         fun checkAnswer(userAnswer: Boolean): Boolean {
-            val correctAnswer = answers[currentIndex]
-            if (userAnswer == correctAnswer) {
-                correctAnswerCount++
-                return true
-            }
-            return false
+            return answers[currentIndex] == userAnswer
+        }
+
+        fun getCorrectAnswer(): Boolean {
+            return answers[currentIndex]
         }
 
         fun moveToNextQuestion() {
