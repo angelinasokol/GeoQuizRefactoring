@@ -1,6 +1,6 @@
 package com.example.geoquiz
 
-import android.R
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -33,6 +33,11 @@ class MainActivity : AppCompatActivity() {
             quizViewModel.correctAnswerCount = it.getInt("KEY_SCORE", 0)
             updateQuestion()
         }
+
+    }
+    fun onClick(view: View?) {
+        val intent = Intent(this, CheatActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
