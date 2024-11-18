@@ -1,12 +1,14 @@
 package com.example.geoquiz
 
+import android.R
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.geoquiz.databinding.ActivityMainBinding
 import androidx.lifecycle.ViewModel
+import com.example.geoquiz.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnTrue.setOnClickListener { checkAnswer(true) }
         binding.btnFalse.setOnClickListener { checkAnswer(false) }
         binding.btnNext.setOnClickListener { nextQuestion() }
+
 
         savedInstanceState?.let {
             quizViewModel.currentIndex = it.getInt("KEY_INDEX", 0)
