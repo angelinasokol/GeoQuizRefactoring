@@ -16,6 +16,8 @@ class MainActivity : AppCompatActivity() {
     private val quizViewModel: QuizViewModel by viewModels()
 
     private var isCheatUsed = false // Флаг для отслеживания использования подсказки
+    private var cheatCount = 0 // Счетчик использованных подсказок
+    private val maxCheats = 3 // Максимальное количество подсказок
 
     // Обработчик результата из CheatActivity
     private val cheatLauncher =
@@ -44,9 +46,15 @@ class MainActivity : AppCompatActivity() {
 
         // Обработчик для кнопки CHEAT
         binding.btnCheat.setOnClickListener {
-            val intent = Intent(this, CheatActivity::class.java)
-            intent.putExtra("EXTRA_ANSWER_IS_TRUE", quizViewModel.getCorrectAnswer())
-            cheatLauncher.launch(intent)
+            if (cheatCount < maxCheats) {
+                val intent = Intent(this, CheatActivity::class.java)
+                intent.putExtra("EXTRA_ANSWER_IS_TRUE", quizViewModel.getCorrectAnswer())
+                cheatLauncher.launch(intent)
+                cheatCount++ // Увеличиваем счетчик подсказок
+            } else {
+                Toast.makeText(this, "Вы использовали все подсказки!", Toast.LENGTH_SHORT).show()
+                binding.btnCheat.visibility = View.INVISIBLE // Скрываем кнопку, если подсказки закончились
+            }
         }
 
         // Восстановление состояния
@@ -66,7 +74,7 @@ class MainActivity : AppCompatActivity() {
     private fun updateQuestion() {
         binding.quiz.text = quizViewModel.currentQuestion
         isCheatUsed = false // Сбрасываем флаг при переходе к следующему вопросу
-        binding.btnCheat.visibility = View.VISIBLE // Делаем кнопку CHEAT снова видимой
+        binding.btnCheat.visibility = if (cheatCount < maxCheats) View.VISIBLE else View.INVISIBLE // Показываем кнопку, если есть доступные подсказки
         binding.btnTrue.visibility = View.VISIBLE // Делаем кнопки TRUE и FALSE видимыми
         binding.btnFalse.visibility = View.VISIBLE
     }
@@ -74,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkAnswer(userAnswer: Boolean) {
         val isCorrect = quizViewModel.checkAnswer(userAnswer)
 
-        // Если была использована подсказка, не засчитываем правильный ответ
+
         val message = if (isCheatUsed) {
             "Вы использовали подсказку!"
         } else {
